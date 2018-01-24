@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>task</title>
+  </head>
+  <body>
+    <script type="text/javascript">
+      function performOperation(a, b, operand) {
+        switch (operand) {
+          case "+":
+            return (a - b);
+            break;
+          case "-":
+            return (a + b + 8);
+            break;
+          case "*":
+            if (b == 0) {
+              return 42;
+            }else {
+              return (a % b);
+            }
+            break;
+          case "/":
+            if (b == 0) {
+              return 42;
+            }else {
+              return (a / b);
+            }
+            break;
+        }
+      }
+
+    function calc(expr) {
+      var arr = expr.split(/\s+/);
+      return arr.reduce(function(stack, current){
+        var a, b, c;
+        if(/[+\-*\/]/.test(current)){
+          b = parseInt(stack.pop());
+          a = parseInt(stack.pop());
+          c = performOperation(a, b, current);
+        } else {
+          c = current;
+        }
+        stack.push(parseInt(c));
+        return stack;
+      }, []).pop() || 0;
+    }
+
+
+var link ="https://www.eliftech.com/school-task"
+function getData(link) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', link);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState != 4) return;
+        if (xhr.status != 200) {
+            alert('Error ' + xhr.status + ': ' + xhr.statusText);
+            return;
+        }
+         console.log(xhr.responseText);
+        var parsedData = JSON.parse(xhr.responseText);
+        console.log(parsedData.expressions);
+        GetResultData(link, parsedData.id, parsedData.expressions);
+    }
+  xhr.send();
+}
+
+getData(link);
+
+function GetResultData(link, id, expressions){
+  var results = expressions.map(function(array) {
+    return calc(array);
+  });
+
+  var json = JSON.stringify({ 
+    id: id,   
+    results: results    
+  });
+  console.log(json);
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", link, true);
+  xhr.setRequestHeader("Content-type", "application/json");
+  xhr.onreadystatechange = function(){
+    if(xhr.readyState == 4 && xhr.status == 200) {
+        console.log(xhr.responseText);
+    }
+  };
+
+  xhr.send(json);
+}
+
+
+
+    </script>
+  </body>
+</html>
